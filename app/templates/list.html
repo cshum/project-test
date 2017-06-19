@@ -1,0 +1,18 @@
+<div class="page">
+  <h2>Products</h2>
+  <ul class="products">
+    <li class="product" ng-repeat="product in products">
+      <h3><a href="#/product/{{ product.id }}">{{ product.name }}</a></h3> 
+      <p><strong>by <a href="#/brand/{{ product.brand_id }}">{{ product.brand_name }}</a></strong></p>
+      <p>{{ product.description }}</p>
+      <p>${{ product.price }}<p>
+      <div class="last" ng-hide="product.last_review_by === ''">
+        <p>Last review by {{ product.last_review_by }}: {{ product.last_review_comment }}
+      </div>
+    </li>
+    <li ng-show="isEmpty">
+      <p>Nothing to see here.</p>
+    </li>
+  </ul>
+</div>
+

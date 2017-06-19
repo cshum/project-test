@@ -1,0 +1,23 @@
+<div class="error" ng-show="error">
+  <p>{{error}}</p>
+</div>
+<div class="page" ng-show="product" >
+  <h2>{{ product.name }}</h2>
+  <p><strong>by <a href="#/brand/{{ product.brand_id }}">{{ product.brand_name }}</a></strong></p>
+  <p>{{ product.description }}</p>
+  <p>${{ product.price }}<p>
+  <h3>Reviews</h3>
+  <ul class="reviews" >
+    <li class="review">
+      <form ng-submit="submit()" >
+        <textarea ng-model="form.comment" required></textarea> <br />
+        Rating: <input type="number" ng-model="form.rating" min="1" max="10" required /> <br />
+        <input type="submit" id="submit" value="Save" />
+      </form>
+    </li>
+    <li class="review" ng-repeat="review in reviews">
+      <p>{{ review.comment }}</p>
+      <p>Rating: {{ review.rating }}</p>
+    </li>
+  </ul>
+</div>
