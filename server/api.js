@@ -1,6 +1,9 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var mongoose = require('mongoose')
+var logger = require('log4js').getLogger()
+var User = require('./models/user')
+var Project = require('./models/project')
 var {
   AppError,
   NotFoundError,
@@ -10,10 +13,11 @@ var {
 
 // util middleware
 function util (req, res, next) {
-  res.cb = function (error, result) {
-    if (error) {
-      res.status(error.status || 400)
-      res.json(error)
+  res.cb = function (err, result) {
+    if (err) {
+      logger.error(err)
+      res.status(err.status || 400)
+      res.json(err)
     } else {
       res.json(result)
     }
@@ -22,7 +26,9 @@ function util (req, res, next) {
 }
 
 module.exports = function (config) {
-  mongoose.connect(config.mongo.uri, config.mongo)
+  mongoose.connect(config.mongo.uri, config.mongo, (err) => {
+    if (err) logger.error(err)
+  })
   var api = express()
 
   api.use(bodyParser.urlencoded({ limit: '1mb', extended: false }))
@@ -41,7 +47,8 @@ module.exports = function (config) {
   api.get('/login', function (req, res) {
   })
 
-  api.get('/signup', function (req, res) {
+  api.post('/signup', function (req, res) {
+    new User(req.body).save(res.cb)
   })
 
   api.use(function (req, res) {
@@ -51,6 +58,7 @@ module.exports = function (config) {
 
   api.use(function (err, req, res, next) {
     // 500 error
+    logger.error(err)
     res.status(500).json(err)
   })
 

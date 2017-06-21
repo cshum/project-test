@@ -1,20 +1,25 @@
 var BaseError = require('es6-error')
 
 class AppError extends BaseError {
-  constructor (msg, status = 400, code) {
+  constructor (msg, status = 400) {
     this.error = true
     this.status = status
-    if (code) {
-      this.code = code
-      this[code] = true
-    }
     super(msg)
+  }
+
+  toJSON () {
+    return {
+      error: true,
+      status: this.status,
+      message: this.message
+    }
   }
 }
 
 class NotFoundError extends AppError {
   constructor (msg = 'Not Found') {
-    super(msg, 404, 'notFound')
+    this.notFound = true
+    super(msg, 404)
   }
 }
 

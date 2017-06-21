@@ -18,7 +18,7 @@ var sassImporter = require('sass-module-importer')
 var dependencies = require('gulp-html-dependencies')
 // var injectReload = require('connect-livereload')
 var touch = require('touch')
-var pump = require('pump')
+var wrap = require('pumpify').obj
 // var zip = require('gulp-zip')
 // var util = require('util')
 // var pkg = require('./package.json')
@@ -29,7 +29,7 @@ gulp.task('server', () => {
 })
 
 gulp.task('clean', () => {
-  return pump(
+  return wrap(
     gulp.src([
       './app/public/js/*.js',
       './app/public/css/*.css',
@@ -41,7 +41,7 @@ gulp.task('clean', () => {
 })
 
 gulp.task('styles', () => {
-  return pump(
+  return wrap(
     gulp.src('./app/scss/*.scss'),
     sass({ importer: sassImporter() }),
     prefix(),
@@ -54,7 +54,7 @@ gulp.task('styles', () => {
 })
 
 gulp.task('html', () => {
-  return pump(
+  return wrap(
     gulp.src('./app/*.html'),
     dependencies({
       dest: 'app/public',
@@ -65,17 +65,17 @@ gulp.task('html', () => {
 })
 
 gulp.task('reloadcss', () => {
-  return pump(
+  return wrap(
     gulp.src('./app/public/css/main.css'),
     livereload()
   )
 })
 
 gulp.task('browserify', () => {
-  return pump(
+  return wrap(
     browserify({
       entries: './app/index.js',
-      standalone: 'ecargo'
+      standalone: 'app'
     }).bundle(),
     source('bundle.js'),
     brfs(),
@@ -100,7 +100,7 @@ gulp.task('zip', () => {
 
 gulp.task('watch', () => {
   gulp.watch(['./app/scss/**/*.scss'], ['styles'])
-  gulp.watch(['./app/*.js', './app/templates/*.html'], ['browserify'])
+  gulp.watch(['!./app/public/js/*.js', './app/**/*.js', './app/templates/*.html'], ['browserify'])
   gulp.watch(['./app/*.html'], ['html'])
   gulp.watch(['./app/public/css/main.css'], ['reloadcss'])
   gulp.watch([
