@@ -29,6 +29,8 @@ module.exports = function (config) {
   mongoose.connect(config.mongo.uri, config.mongo, (err) => {
     if (err) logger.error(err)
   })
+  if (config.secret) User.setSecret(config.secret)
+
   var api = express()
 
   api.use(bodyParser.urlencoded({ limit: '1mb', extended: false }))
@@ -44,11 +46,12 @@ module.exports = function (config) {
   api.put('/projects/:project_id', function (req, res, next) {
   })
 
-  api.get('/login', function (req, res) {
+  api.post('/login', function (req, res) {
+    User.login(req.body, res.cb)
   })
 
   api.post('/signup', function (req, res) {
-    new User(req.body).save(res.cb)
+    new User(req.body).signup(res.cb)
   })
 
   api.use(function (req, res) {

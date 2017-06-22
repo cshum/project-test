@@ -18,28 +18,3 @@ test('Products', function (t) {
     t.equal(err.message, 'getProduct not found')
   })
 })
-
-test('Add Review', function (t) {
-  t.plan(6)
-  api.addReview('asdf', 12, 'foo bar', 5, function (err) {
-    t.equal(err.message, 'getUser not found', 'review validation')
-  })
-  api.addReview(3, 'asdf', 'foo bar', 5, function (err) {
-    t.equal(err.message, 'getProduct not found', 'review validation')
-  })
-  api.addReview(3, 'asdf', 'foo bar', 167, function (err) {
-    t.equal(err.message, 'Invalid rating.', 'review validation')
-  })
-  api.addReview(3, 12, 'foo bar', 5, function (err) {
-    t.notOk(err)
-    api.getProduct(12, function (err, res) {
-      t.notOk(err)
-      t.equal(res.last_review_comment, 'foo bar', 'Last review comment.')
-    })
-  })
-})
-
-test('Close', function (t) {
-  api.close()
-  t.end()
-})

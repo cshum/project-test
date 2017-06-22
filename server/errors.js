@@ -2,15 +2,14 @@ var BaseError = require('es6-error')
 
 class AppError extends BaseError {
   constructor (msg, status = 400) {
+    super(msg)
     this.error = true
     this.status = status
-    super(msg)
   }
 
   toJSON () {
     return {
       error: true,
-      status: this.status,
       message: this.message
     }
   }
