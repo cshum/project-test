@@ -81,8 +81,7 @@ UserSchema.statics.login = async(function * ({ email, password }, next) {
 })
 
 UserSchema.methods.signup = async(function * (next) {
-  var user = yield this.save()
-  return response(user)
+  return response(yield this.save())
 })
 
 module.exports = mongoose.model('User', UserSchema)
