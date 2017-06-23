@@ -1,15 +1,12 @@
-var crypto = require('crypto')
 var async = require('raco').wrap
 
-var createHash = (str, salt) => crypto.pbkdf2Sync(str, salt, 4096, 64, 'SHA1').toString('base64')
-var createSalt = () => crypto.randomBytes(18).toString('base64')
-
-var PWD_REGEX = /^[a-zA-Z0-9]{8,}$/i
-var isPassword = (pwd) => PWD_REGEX.test(pwd)
+function hook (genFn) {
+  var fn = async(genFn)
+  return function (next) {
+    return fn.call(this, next)
+  }
+}
 
 module.exports = {
-  createHash,
-  createSalt,
-  isPassword,
-  async
+  async, hook
 }
