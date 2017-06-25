@@ -83,13 +83,7 @@ UserSchema.post('save', clear)
 
 UserSchema.statics.setSecret = (secret) => _secret = secret
 
-UserSchema.statics.verify = (token) => {
-  try {
-    return jwt.verify(token, _secret)
-  } catch (e) {
-    return null
-  }
-}
+UserSchema.statics.verify = (token) => jwt.verify(token, _secret)
 
 UserSchema.statics.login = async(function * ({ email, password }, next) {
   var user = yield this.findOne({ email })

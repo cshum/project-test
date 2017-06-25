@@ -23,13 +23,22 @@ const auth = () => {
     var token = req.headers.Authorization || req.headers.authorization || req.query.token
     if (typeof token === 'string') {
       if (token.substr(0, 7) === 'Bearer ') token = token.slice(7)
-      req.access = User.verify(token)
-      if (!(req.access && req.access._id)) return res.cb(new AuthError('Invalid Token'))
-      next()
+      try {
+        req.access = User.verify(token)
+        if (!(req.access && req.access._id)) throw new AuthError('Invalid Token')
+      } catch (err) {
+        if (err && err.name === 'TokenExpiredError') {
+          return res.cb(new AuthError('Token Expired', true))
+        }
+      }
+      if (req.access && req.access._id) return next()
+      else return res.cb(new AuthError('Invalid token'))
     } else {
-      return res.cb(new AuthError('User unauthorized'))
+      return res.cb(new AuthError('Unauthorized'))
     }
   }
 }
 
-module.exports = { common, auth }
+module.exports = {
+  common, auth
+}

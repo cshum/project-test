@@ -13,7 +13,7 @@ class AppError extends Err {
     // json response
     this.response = {
       error: true,
-      type: this.constructor.name,
+      name: this.constructor.name,
       message: this.message
     }
   }
@@ -22,11 +22,12 @@ class AppError extends Err {
   }
 }
 class AuthError extends AppError {
-  constructor (msg = 'Unauthorized') {
+  constructor (msg = 'Unauthorized', expired) {
     super(msg, 401)
+    this.expired = expired
+    this.response.expired = expired
   }
 }
-
 class NotFoundError extends AppError {
   constructor (msg = 'Not found', ref) {
     super(msg, 404)
