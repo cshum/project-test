@@ -1,31 +1,27 @@
-var gulp = require('gulp')
-var uglify = require('gulp-uglify')
-var sass = require('gulp-sass')
-var browserify = require('browserify')
-var source = require('vinyl-source-stream')
-var buffer = require('vinyl-buffer')
-// var open = require('gulp-open')
-var prefix = require('gulp-autoprefixer')
-var brfs = require('gulp-brfs')
-var livereload = require('gulp-livereload')
-var minifycss = require('gulp-minify-css')
-var sourcemaps = require('gulp-sourcemaps')
-var rename = require('gulp-rename')
-var filter = require('gulp-filter')
-var sequence = require('run-sequence')
-var clean = require('gulp-clean')
-var sassImporter = require('sass-module-importer')
-var dependencies = require('gulp-html-dependencies')
-// var injectReload = require('connect-livereload')
-var touch = require('touch')
-var wrap = require('pumpify').obj
-// var zip = require('gulp-zip')
-// var util = require('util')
-// var pkg = require('./package.json')
-
+const gulp = require('gulp')
+const uglify = require('gulp-uglify')
+const sass = require('gulp-sass')
+const browserify = require('browserify')
+const source = require('vinyl-source-stream')
+const buffer = require('vinyl-buffer')
+const prefix = require('gulp-autoprefixer')
+const brfs = require('gulp-brfs')
+const minifycss = require('gulp-minify-css')
+const sourcemaps = require('gulp-sourcemaps')
+const rename = require('gulp-rename')
+const sequence = require('run-sequence')
+const clean = require('gulp-clean')
+const sassImporter = require('sass-module-importer')
+const dependencies = require('gulp-html-dependencies')
+const wrap = require('pumpify').obj
+const nodemon = require('gulp-nodemon')
 
 gulp.task('server', () => {
-  require('./server.js')
+  nodemon({
+    script: 'server.js', ext: 'js',
+    ignore: ['app/**/*.js', 'gulpfile.js'],
+    env: { 'NODE_ENV': 'development' }
+  })
 })
 
 gulp.task('clean', () => {
@@ -64,13 +60,6 @@ gulp.task('html', () => {
   )
 })
 
-gulp.task('reloadcss', () => {
-  return wrap(
-    gulp.src('./app/public/css/main.css'),
-    livereload()
-  )
-})
-
 gulp.task('browserify', () => {
   return wrap(
     browserify({
@@ -83,19 +72,8 @@ gulp.task('browserify', () => {
     sourcemaps.init({loadMaps: true}),
     uglify(),
     sourcemaps.write('./'),
-    gulp.dest('./app/public/js'),
-    livereload()
+    gulp.dest('./app/public/js')
   )
-})
-
-gulp.task('serverScripts', () => {
-  touch('gulpfile.js')
-})
-
-gulp.task('zip', () => {
-  // return gulp.src('public#<{(||)}>#*')
-  // .pipe(zip(util.format('%s-%s.zip', pkg.name, pkg.version)))
-  // .pipe(gulp.dest('./'))
 })
 
 gulp.task('watch', () => {
@@ -103,9 +81,6 @@ gulp.task('watch', () => {
   gulp.watch(['!./app/public/js/*.js', './app/**/*.js', './app/templates/*.html'], ['browserify'])
   gulp.watch(['./app/*.html'], ['html'])
   gulp.watch(['./app/public/css/main.css'], ['reloadcss'])
-  gulp.watch([
-    './server.js', './server/*.js', '!./gulpfile.js'
-  ], ['serverScripts'])
 })
 
 gulp.task('start', () => {
@@ -114,8 +89,4 @@ gulp.task('start', () => {
 
 gulp.task('build', () => {
   sequence('clean', ['browserify', 'styles', 'html'])
-})
-
-gulp.task('release', () => {
-  sequence('clean', ['browserify', 'styles', 'html'], 'zip')
 })

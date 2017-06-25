@@ -52,6 +52,7 @@ class ServerError extends AppError {
 
 const wrapError = (err) => {
   if (err instanceof AppError) {
+    // expected app generated error
     return err
   } else if (err && err.name === 'MongoError' && err.code === 11000) {
     // wrap mongo duplicated key error
@@ -60,7 +61,7 @@ const wrapError = (err) => {
     // wrap mongo schema validation error
     return new ValidationError(err.message, err.errors)
   } else {
-    // wrap unexpected error
+    // unexpected error as 500 server error
     logger.error(err)
     return new ServerError(err)
   }
