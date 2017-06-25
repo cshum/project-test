@@ -1,40 +1,57 @@
-var BaseError = require('es6-error')
+'use strict'
+
+var logger = require('log4js').getLogger()
+
+const BaseError = require('es6-error')
 
 class AppError extends BaseError {
   constructor (msg, status = 400) {
     super(msg)
     this.error = true
     this.status = status
-  }
-
-  toJSON () {
-    return {
+    this.response = {
       error: true,
+      name: this.constructor.name,
       message: this.message
     }
   }
+  toJSON () {
+    return this.response
+  }
 }
-
+class AuthError extends AppError {
+  constructor (msg = 'Unauthorized') {
+    super(msg, 401)
+  }
+}
 class NotFoundError extends AppError {
-  constructor (msg = 'Not Found') {
+  constructor (msg = 'Not found', ref) {
     super(msg, 404)
     this.notFound = true
+    this.ref = ref
+    this.response.ref = ref
   }
 }
 
 class ServerError extends AppError {
-  constructor (msg = 'Server Error') {
-    super(msg, 500)
+  constructor ({ message }) {
+    super(message || 'Server error', 500)
   }
 }
 
-function wrapError (err) {
-  if (!err) return {
+const wrapError = (err) => {
+  if (err instanceof AppError) {
+    return err
+  } else {
+    // unexpected error
+    logger.error(err)
+    return new ServerError(err)
   }
 }
 
 module.exports = {
   AppError,
+  AuthError,
   NotFoundError,
   ServerError,
   wrapError

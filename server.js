@@ -12,11 +12,8 @@ var config = Object.assign({}, require('./config.default.json'), require('./conf
 
 var port = config.port
 
-// var api = require('./server/api')(config.mysql)
-
 var app = express()
-
-app.use('/api', require('./server/api')(config, logger))
+app.use('/api', require('./server/api')(config))
 app.use(express.static('./app/public'))
 
 app.listen(port)

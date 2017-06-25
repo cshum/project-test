@@ -1,9 +1,11 @@
-var mongoose = require('mongoose')
-var Schema = mongoose.Schema
-var { async, hook } = require('../utils')
-var { AppError, NotFoundError, ServerError } = require('../errors')
+'use strict'
 
-var ProjectSchema = new Schema({
+const mongoose = require('mongoose')
+const Schema = mongoose.Schema
+const { async, hook } = require('../utils')
+const { AppError, NotFoundError, ServerError } = require('../errors')
+
+const ProjectSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -37,12 +39,10 @@ ProjectSchema.pre('save', hook(function * (next) {
 }))
 
 ProjectSchema.statics.update = async(function * (id, val, next) {
-  var project = yield this.findById(id) 
-  if (!project) throw new NotFoundError(`Project ${id} not found`)
+  let project = yield this.findById(id) 
+  if (!project) throw new NotFoundError('Project not found', id)
   Object.assign(project, val)
   return yield project.save()
 })
 
-var Project = mongoose.model('Project', ProjectSchema)
-
-module.exports = Project
+module.exports = mongoose.model('Project', ProjectSchema)

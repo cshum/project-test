@@ -1,46 +1,15 @@
-var express = require('express')
-var bodyParser = require('body-parser')
-var mongoose = require('mongoose')
-var logger = require('log4js').getLogger()
-var User = require('./models/user')
-var Project = require('./models/project')
-var request = require('superagent')
+'use strict'
 
-var { md } = require('./utils')
-var {
-  AppError,
-  NotFoundError,
-  ServerError,
-  wrapError
-} = require('./errors')
+const express = require('express')
+const bodyParser = require('body-parser')
+const mongoose = require('mongoose')
+const User = require('./models/user')
+const Project = require('./models/project')
+const { common, auth } = require('./middlewares')
 
-// util middleware
-var util = (req, res, next) => {
-  res.cb = (err, result) => {
-    if (err) {
-      logger.error(err)
-      res.status(err.status || 400)
-      res.json(err)
-    } else {
-      res.json(result)
-    }
-  }
-  next()
-}
-// verify jwt token
-var auth = () => {
-  return (req, res, next) => {
-    var token = req.headers.Authorization || req.headers.authorization || req.query.token
-    if (typeof token === 'string') {
-      if (token.substr(0, 7) === 'Bearer ') token = token.slice(7)
-      req.access = User.verify(token)
-      if (!(req.access && req.access._id)) return res.cb(new AppError('Invalid Token'))
-      next()
-    } else {
-      return res.cb(new AppError('User unauthorized'))
-    }
-  }
-}
+const log4js = require('log4js')
+const logger = log4js.getLogger('api')
+const { NotFoundError, wrapError } = require('./errors')
 
 module.exports = function api (config) {
   mongoose.connect(config.mongo.uri, config.mongo, (err) => {
@@ -48,11 +17,12 @@ module.exports = function api (config) {
   })
   if (config.secret) User.setSecret(config.secret)
 
-  var api = express()
+  const api = express()
 
   api.use(bodyParser.urlencoded({ limit: '1mb', extended: false }))
   api.use(bodyParser.json({ limit: '1mb' }))
-  api.use(util)
+  api.use(log4js.connectLogger(logger, { level: 'auto', format: ':method :url :status' }))
+  api.use(common)
 
   api.post('/login', (req, res) => User.login(req.body, res.cb))
   api.post('/signup', (req, res) => new User(req.body).signup(res.cb))
@@ -73,40 +43,19 @@ module.exports = function api (config) {
     Project.update(req.params.project_id, req.body, res.cb)
   })
 
-  api.get('/profile', md(function * (req, res, next) {
-    var result, user, extra, friends
-    var token = '5a9b09c86195b8d8b01ee219d7d9794e2abb6641a2351850c49c309f'
-
-    result = yield request.get('http://dev.the-straits-network.com/me/basic')
-      .query({ token })
-      .end(next)
-    user = result.body
-    if (!(user && user.id)) throw new NotFoundError()
-
-    result = yield request.get(`http://dev.the-straits-network.com/${user.id}/extra`)
-      .query({ token })
-      .end(next)
-    extra = result.body
-    
-    result = yield request.get(`http://dev.the-straits-network.com/${user.id}/friends`)
-      .query({ token })
-      .end(next)
-    friends = result.body
-
-    Object.assign(user, extra, { friends })
-
-    res.cb(null, user)
-  }))
+  api.get('/profile', (req, res) => {
+    let token = '5a9b09c86195b8d8b01ee219d7d9794e2abb6641a2351850c49c309f'
+    User.getProfile(token, res.cb)
+  })
 
   api.use((req, res) => {
     // 404 error
-    res.status(404).json(new NotFoundError())
+    res.status(404).json(new NotFoundError('Page not found', req.originalUrl))
   })
 
   api.use((err, req, res, next) => {
-    // 500 error
-    logger.error(err)
-    res.status(500).json(err)
+    err = wrapError(err)
+    res.status(err.status).json(err)
   })
 
   return api
