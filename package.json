@@ -57,6 +57,6 @@
   "author": "Adrian C Shum",
   "homepage": "https://github.com/cshum/project-test",
   "scripts": {
-    "test": "standard && node server/test/test.js"
+    "test": "standard && tape server/test/*.js"
   }
 }
