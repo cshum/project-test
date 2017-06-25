@@ -1,5 +1,9 @@
 module.exports = [
-  '$scope', '$timeout', '$routeParams',
-  function ($scope, $timeout, $routeParams) {
+  '$scope', '$timeout', '$http', '$routeParams',
+  function ($scope, $timeout, $http, $routeParams) {
+      $http({
+        method: "GET",
+        url: "/api/projects"
+      })
   }
 ]

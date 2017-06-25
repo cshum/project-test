@@ -1,6 +1,6 @@
 module.exports = [
-  '$rootScope', '$q', '$window',
-  function ($rootScope, $q, $window) {
+  '$rootScope', '$q', '$window', '$location',
+  function ($rootScope, $q, $window, $location) {
     return {
       request: function (config) {
         config.headers = config.headers || {};
@@ -20,7 +20,10 @@ module.exports = [
         }
         return config;
       },
-      responseError: function(error) {
+      responseError: function (error) {
+        if (error && error.status === 401) {
+          $rootScope.$broadcast('unauthorized')
+        }
         return error;
       }
     }

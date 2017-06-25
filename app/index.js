@@ -39,3 +39,12 @@ app.controller('dashboardCtrl', require('./controllers/dashboard'))
 app.controller('loginCtrl', require('./controllers/login'))
 app.controller('signupCtrl', require('./controllers/signup'))
 app.controller('projectCtrl', require('./controllers/project'))
+
+app.run([
+  '$location', '$rootScope',
+  function ($location, $rootScope) {
+    $rootScope.$on('unauthorized', function () {
+      $location.path('/login')
+    })
+  }
+])
