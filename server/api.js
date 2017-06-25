@@ -29,6 +29,7 @@ module.exports = function api (config) {
 
   api.get('/me', auth(), (req, res) => User.get(req.access._id, res.cb))
   api.put('/me', auth(), (req, res) => User.update(req.access._id, req.body, res.cb))
+  api.post('/token', auth(), (req, res) => res.cb(null, User.sign(req.access)))
 
   api.get('/projects', auth(), (req, res) => {
     Project.find(res.cb)

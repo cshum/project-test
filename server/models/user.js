@@ -26,14 +26,6 @@ const createHash = async(function * (str, salt, next) {
 const PWD_REGEX = /^[a-zA-Z0-9]{8,}$/i // min 8 chars, only letters and numbers
 const isPassword = (pwd) => PWD_REGEX.test(pwd)
 
-// sign jwt token expires 1 hour
-const sign = ({ email, _id }) => {
-  return {
-    email, _id,
-    token: jwt.sign({ email, _id }, _secret, { expiresIn: '1h' })
-  }
-}
-
 const UserSchema = new Schema({
   email: {
     type: String,
@@ -85,6 +77,14 @@ UserSchema.statics.setSecret = (secret) => _secret = secret
 
 UserSchema.statics.verify = (token) => jwt.verify(token, _secret)
 
+// sign jwt token expires 1 hour
+UserSchema.statics.sign = ({ email, _id }) => {
+  return {
+    email, _id,
+    token: jwt.sign({ email, _id }, _secret, { expiresIn: '1h' })
+  }
+}
+
 UserSchema.statics.login = async(function * ({ email, password }, next) {
   var user = yield this.findOne({ email })
   // user exists and password hash matches
@@ -92,11 +92,11 @@ UserSchema.statics.login = async(function * ({ email, password }, next) {
     user && user.salt && 
     user.hash === (yield createHash(password, user.salt, next))
   if (!isValid) throw new AuthError('Invalid email or password.')
-  return sign(user)
+  return this.sign(user)
 })
 
 UserSchema.methods.signup = async(function * () {
-  return sign(yield this.save())
+  return this.sign(yield this.save())
 })
 
 UserSchema.statics.get = async(function * (id) {
