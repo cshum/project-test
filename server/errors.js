@@ -17,8 +17,8 @@ class AppError extends BaseError {
 
 class NotFoundError extends AppError {
   constructor (msg = 'Not Found') {
-    this.notFound = true
     super(msg, 404)
+    this.notFound = true
   }
 }
 
