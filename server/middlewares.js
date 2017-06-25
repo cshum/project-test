@@ -11,7 +11,6 @@ const common = (req, res, next) => {
     if (err) {
       err = wrapError(err)
       res.status(err.status).json(err)
-      res.json(err)
     } else {
       res.json(result)
     }
