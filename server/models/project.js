@@ -39,7 +39,7 @@ ProjectSchema.pre('save', hook(function * (next) {
 }))
 
 ProjectSchema.statics.update = async(function * (id, val, next) {
-  let project = yield this.findById(id) 
+  var project = yield this.findById(id) 
   if (!project) throw new NotFoundError('Project not found', id)
   Object.assign(project, val)
   return yield project.save()

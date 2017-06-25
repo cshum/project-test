@@ -1,17 +1,19 @@
 'use strict'
 
-var logger = require('log4js').getLogger()
+const logger = require('log4js').getLogger()
+const Err = require('es6-error')
 
-const BaseError = require('es6-error')
-
-class AppError extends BaseError {
+// Base error class for all expected, app generated errors
+class AppError extends Err {
   constructor (msg, status = 400) {
     super(msg)
     this.error = true
     this.status = status
+
+    // json response
     this.response = {
       error: true,
-      name: this.constructor.name,
+      type: this.constructor.name,
       message: this.message
     }
   }
@@ -24,12 +26,21 @@ class AuthError extends AppError {
     super(msg, 401)
   }
 }
+
 class NotFoundError extends AppError {
   constructor (msg = 'Not found', ref) {
     super(msg, 404)
     this.notFound = true
     this.ref = ref
     this.response.ref = ref
+  }
+}
+
+class ValidationError extends AppError {
+  constructor (msg = 'Invalid', errors) {
+    super(msg, 400)
+    this.errors = errors
+    this.response.errors = errors
   }
 }
 
@@ -42,8 +53,14 @@ class ServerError extends AppError {
 const wrapError = (err) => {
   if (err instanceof AppError) {
     return err
+  } else if (err && err.name === 'MongoError' && err.code === 11000) {
+    // wrap mongo duplicated key error
+    return new ValidationError('Key duplicated')
+  } else if (err && err.name === 'ValidationError') {
+    // wrap mongo schema validation error
+    return new ValidationError(err.message, err.errors)
   } else {
-    // unexpected error
+    // wrap unexpected error
     logger.error(err)
     return new ServerError(err)
   }
@@ -53,6 +70,7 @@ module.exports = {
   AppError,
   AuthError,
   NotFoundError,
+  ValidationError,
   ServerError,
   wrapError
 }

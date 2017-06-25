@@ -44,7 +44,7 @@ module.exports = function api (config) {
   })
 
   api.get('/profile', (req, res) => {
-    let token = '5a9b09c86195b8d8b01ee219d7d9794e2abb6641a2351850c49c309f'
+    var token = '5a9b09c86195b8d8b01ee219d7d9794e2abb6641a2351850c49c309f'
     User.getProfile(token, res.cb)
   })
 
@@ -55,7 +55,7 @@ module.exports = function api (config) {
 
   api.use((err, req, res, next) => {
     err = wrapError(err)
-    res.status(err.status).json(err)
+    res.status(err.status || 500).json(err)
   })
 
   return api

@@ -21,7 +21,7 @@ const common = (req, res, next) => {
 // verify jwt token
 const auth = () => {
   return (req, res, next) => {
-    let token = req.headers.Authorization || req.headers.authorization || req.query.token
+    var token = req.headers.Authorization || req.headers.authorization || req.query.token
     if (typeof token === 'string') {
       if (token.substr(0, 7) === 'Bearer ') token = token.slice(7)
       req.access = User.verify(token)

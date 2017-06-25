@@ -10,16 +10,16 @@ const jwt = require('jsonwebtoken')
 const request = require('superagent')
 
 // jwt secret, should be overriden by config
-let _secret = 'keyboardcat' 
+var _secret = 'keyboardcat' 
 
 // random generated password salt
 const createSalt = async(function * (next) {
-  let buf = yield crypto.randomBytes(18, next)
+  var buf = yield crypto.randomBytes(18, next)
   return buf.toString('base64')
 })
 // password hash from plain & salt
 const createHash = async(function * (str, salt, next) {
-  let buf = yield crypto.pbkdf2(str, salt, 4096, 64, 'SHA1', next)
+  var buf = yield crypto.pbkdf2(str, salt, 4096, 64, 'SHA1', next)
   return buf.toString('base64')
 })
 
@@ -30,7 +30,7 @@ const isPassword = (pwd) => PWD_REGEX.test(pwd)
 const sign = ({ email, _id }) => {
   return {
     email, _id,
-    token: jwt.sign({email, _id}, _secret, { expiresIn: '1h' })
+    token: jwt.sign({ email, _id }, _secret, { expiresIn: '1h' })
   }
 }
 
@@ -92,9 +92,9 @@ UserSchema.statics.verify = (token) => {
 }
 
 UserSchema.statics.login = async(function * ({ email, password }, next) {
-  let user = yield this.findOne({ email })
+  var user = yield this.findOne({ email })
   // user exists and password hash matches
-  let isValid = 
+  var isValid = 
     user && user.salt && 
     user.hash === (yield createHash(password, user.salt, next))
   if (!isValid) throw new AuthError('Invalid email or password.')
@@ -110,14 +110,14 @@ UserSchema.statics.get = async(function * (id) {
 })
 
 UserSchema.statics.update = async(function * (id, val) {
-  let user = yield this.findById(id)
+  var user = yield this.findById(id)
   if (!user) throw new NotFoundError('User not found', id)
   Object.assign(user, val)
   return yield user.save()
 })
 
 UserSchema.statics.getProfile = async(function * (token, next) {
-  let result, user, extra, friends
+  var result, user, extra, friends
 
   result = yield request.get('http://dev.the-straits-network.com/me/basic')
     .query({ token })
