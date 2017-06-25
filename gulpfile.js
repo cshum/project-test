@@ -70,7 +70,7 @@ gulp.task('browserify', () => {
     brfs(),
     buffer(),
     sourcemaps.init({loadMaps: true}),
-    uglify(),
+    // uglify(),
     sourcemaps.write('./'),
     gulp.dest('./app/public/js')
   )

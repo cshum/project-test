@@ -4,9 +4,10 @@ var angular = global.angular
 var app = angular.module('app', ['ngResource', 'ngRoute'])
 
 app.config([
-  '$routeProvider', '$locationProvider',
-  function ($routeProvider, $locationProvider) {
+  '$routeProvider', '$locationProvider', '$httpProvider',
+  function ($routeProvider, $locationProvider, $httpProvider) {
     $locationProvider.hashPrefix('')
+    $httpProvider.interceptors.push('httpInterceptor')
     $routeProvider
       .when('/', {
         template: fs.readFileSync(__dirname + '/app/templates/dashboard.html', 'utf8'),
@@ -30,6 +31,10 @@ app.config([
   }
 ])
 
+// Factories
+app.factory('httpInterceptor', require('./factories/httpinterceptor'));
+
+// Controllers
 app.controller('dashboardCtrl', require('./controllers/dashboard'))
 app.controller('loginCtrl', require('./controllers/login'))
 app.controller('signupCtrl', require('./controllers/signup'))

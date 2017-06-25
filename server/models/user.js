@@ -54,7 +54,7 @@ UserSchema.pre('save', hook(function * (next) {
     // store hash & salt, clear plain text pwd
     this.salt = yield createSalt(next)
     this.hash = yield createHash(this.password, this.salt, next)
-    this.set('password', undefined) // clear plain text pwd
+    this.set('password', undefined)
   } else if (this.isModified('hash') || this.isModified('salt')) {
     // hash & salt must not be modified by user
     throw new AuthError('Invalid operation')
@@ -81,7 +81,7 @@ UserSchema.statics.verify = (token) => jwt.verify(token, _secret)
 UserSchema.statics.sign = ({ email, _id }) => {
   return {
     email, _id,
-    token: jwt.sign({ email, _id }, _secret, { expiresIn: '1h' })
+    token: jwt.sign({ email, _id }, _secret, { expiresIn: '4h' })
   }
 }
 
