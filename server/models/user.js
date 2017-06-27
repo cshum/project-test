@@ -89,7 +89,7 @@ UserSchema.statics.login = async(function * ({ email, password }, next) {
   var user = yield this.findOne({ email })
   // user exists and password hash matches
   var isValid = 
-    user && user.salt && 
+    password && user && user.salt && 
     user.hash === (yield createHash(password, user.salt, next))
   if (!isValid) throw new AuthError('Invalid email or password.')
   return this.sign(user)
