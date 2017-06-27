@@ -86,7 +86,7 @@ gulp.task('browserify', () => {
 
 gulp.task('watch', () => {
   gulp.watch(['./app/scss/**/*.scss'], ['styles'])
-  gulp.watch(['!./app/public/js/*.js', './app/**/*.js', './app/templates/*.html'], ['browserify'])
+  gulp.watch(['!./app/public/**/*.js', './app/**/*.js', './app/templates/*.html'], ['browserify'])
   gulp.watch(['./app/*.html'], ['html'])
 })
 
@@ -97,5 +97,7 @@ gulp.task('build', () => {
 })
 
 gulp.task('start', () => {
-  sequence('server', 'build', 'watch')
+  sequence('server', [
+    'browserify', 'styles', 'html', 'bootstrap-fonts'
+  ], 'watch')
 })

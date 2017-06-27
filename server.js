@@ -6,13 +6,12 @@ const pkg = require('./package.json')
 const express = require('express')
 const fs = require('fs-extra')
 const NODE_ENV = process.env.NODE_ENV
-const mode = (NODE_ENV && NODE_ENV !== 'default') ? NODE_ENV : 'production'
+const mode = process.env.NODE_ENV || 'production'
 
-const configFile = `./config.${mode}.json`
-if (!fs.existsSync(configFile)) {
-  fs.copySync('./config.default.json', configFile)
+if (!fs.existsSync('./config.json')) {
+  fs.copySync('./config.default.json', './config.json')
 }
-const config = require(configFile)
+const config = require('./config.json')
 const port = parseInt(process.argv[2]) || config.port
 
 const app = express()
