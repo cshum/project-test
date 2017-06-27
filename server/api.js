@@ -11,6 +11,8 @@ const log4js = require('log4js')
 const logger = log4js.getLogger('api')
 const { NotFoundError, wrapError } = require('./errors')
 
+mongoose.Promise = global.Promise
+
 module.exports = function api (config) {
   mongoose.connect(config.mongo.uri, config.mongo, (err) => {
     if (err) logger.error(err)
@@ -21,7 +23,6 @@ module.exports = function api (config) {
 
   api.use(bodyParser.urlencoded({ limit: '1mb', extended: false }))
   api.use(bodyParser.json({ limit: '1mb' }))
-  api.use(log4js.connectLogger(logger, { level: 'auto', format: ':method :url :status' }))
   api.use(common)
 
   api.post('/login', (req, res) => User.login(req.body, res.cb))
@@ -38,7 +39,7 @@ module.exports = function api (config) {
     new Project(req.body).save(res.cb)
   })
   api.get('/projects/:project_id', auth(), (req, res) => {
-    Project.findById(req.params.project_id, res.cb)
+    Project.get(req.params.project_id, res.cb)
   })
   api.put('/projects/:project_id', auth(), (req, res) => {
     Project.update(req.params.project_id, req.body, res.cb)

@@ -60,6 +60,14 @@ gulp.task('html', () => {
   )
 })
 
+gulp.task('bootstrap-fonts', () => {
+  // hack
+  return wrap(
+    gulp.src('./node_modules/bootstrap/fonts/*'),
+    gulp.dest('./app/public/vendor/bootstrap/dist/fonts')
+  )
+})
+
 gulp.task('browserify', () => {
   return wrap(
     browserify({
@@ -80,13 +88,14 @@ gulp.task('watch', () => {
   gulp.watch(['./app/scss/**/*.scss'], ['styles'])
   gulp.watch(['!./app/public/js/*.js', './app/**/*.js', './app/templates/*.html'], ['browserify'])
   gulp.watch(['./app/*.html'], ['html'])
-  gulp.watch(['./app/public/css/main.css'], ['reloadcss'])
-})
-
-gulp.task('start', () => {
-  sequence('server', 'clean', ['browserify', 'styles', 'html'], 'watch')
 })
 
 gulp.task('build', () => {
-  sequence('clean', ['browserify', 'styles', 'html'])
+  sequence('clean', [
+    'browserify', 'styles', 'html', 'bootstrap-fonts'
+  ])
+})
+
+gulp.task('start', () => {
+  sequence('server', 'build', 'watch')
 })

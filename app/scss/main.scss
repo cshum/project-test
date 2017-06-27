@@ -1,13 +1,11 @@
 .container {
   max-width: 1000px;
 }
-
-.error {
-  color: red;
+[ng-click] {
+  cursor: pointer;
 }
-
-.review {
-  textarea {
-    width: 50%;
+.jumbotron {
+  h2 {
+    margin-bottom: 25px;
   }
 }

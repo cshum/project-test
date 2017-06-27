@@ -1,15 +1,19 @@
-<div class="alert alert-danger" role="alert" ng-if="!!error" ><p ng-bind="error.message"></p></div>
-<div class="login jumbotron" >
-  <h2>Login</h2>
-  <form>
-    <p>
-    <input type="text" id="email" data-ng-model="email" class="form-control" placeholder="Email" />
-    </p>
-    <p>
-    <input type="password" id="pasword" data-ng-model="password" class="form-control" placeholder="Password" />
-    </p>
-    <p>
-      <button class="btn btn-lg btn-primary" id="submit" data-ng-click="login()">Login</button>
-    </p>
-  </form>
+<div class="login">
+  <div class="page-header">
+    <h2>Login</h2>
+  </div>
+  <div class="alert alert-danger" role="alert" ng-if="!!error" ><p ng-bind="error.message"></p></div>
+  <div class="jumbotron" >
+    <form>
+      <div class="form-group">
+        <input type="text" id="email" data-ng-model="form.email" class="form-control"  placeholder="Email" />
+      </div>
+      <div class="form-group">
+        <input type="password" id="pasword" data-ng-model="form.password" class="form-control"  placeholder="Password" />
+      </div>
+      <div class="form-group">
+        <button class="btn btn-lg btn-primary" id="submit" data-ng-click="login()">Login</button>
+        <a class="btn btn-lg btn-info pull-right" ui-sref="signup">Signup</a>
+      </div>
+  </div>
 </div>

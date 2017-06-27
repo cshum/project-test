@@ -1,18 +1,15 @@
 module.exports = [
-  '$rootScope', '$q', '$window', '$location',
-  function ($rootScope, $q, $window, $location) {
+  '$rootScope', '$cookies',
+  function ($rootScope, $cookies) {
     return {
       request: function (config) {
         config.headers = config.headers || {};
-        if (!$rootScope.access && $window.localStorage.getItem('access')) {
-          var access
-          try {
-            access = JSON.parse($window.localStorage.getItem('access'))
-          } catch (e) {}
+        if (!$rootScope.access && $cookies.getObject('access')) {
+          var access = $cookies.getObject('access')
           if (access && access.token) {
             $rootScope.access = access
           } else {
-            $window.localStorage.removeItem('access')
+            $cookies.remove('access')
           }
         }
         if ($rootScope.access) {

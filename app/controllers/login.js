@@ -1,27 +1,12 @@
 module.exports = [
-  '$rootScope', '$scope', '$timeout', '$http', '$window',
-  function ($rootScope, $scope, $timeout, $http, $window) {
+  '$rootScope', '$scope', 'Auth',
+  function ($rootScope, $scope, Auth) {
     $scope.error = null
+    $scope.form = {}
     $scope.login = function () {
-      $http({
-        method: "POST",
-        url: "/api/login",
-        data: {
-          email: $scope.email,
-          password: $scope.password
-        }
-      })
-      .then(function (result) {
-        var access = result && result.data
-        if (access && access.token && !access.error) {
-          $rootScope.access = access
-          $window.localStorage.setItem('access', JSON.stringify(access))
-        } else {
-          throw result
-        }
-      })
+      return Auth.login($scope.form)
       .catch(function (err) {
-        $scope.error = err && err.data
+        $scope.error = err
       })
     }
   }

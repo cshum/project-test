@@ -3,7 +3,8 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const { async, hook } = require('../utils')
-const { AppError, NotFoundError, ServerError } = require('../errors')
+const { NotFoundError, ValidationError } = require('../errors')
+const { isMongoId } = require('validator')
 
 const ProjectSchema = new Schema({
   title: {
@@ -31,15 +32,20 @@ const ProjectSchema = new Schema({
 
 ProjectSchema.pre('save', hook(function * (next) {
   if (this.status === 'finished' && Date.now() > this.start_at) {
-    throw new AppError('Project already expired')
+    throw new ValidationError('Project already expired')
   }
   this.updated_at = Date.now()
-  if (this.isModified('created_at')) throw new AppError('Invalid operation')
+  if (this.isModified('created_at')) throw new ValidationError('Invalid operation')
   if (!this.created_at) this.created_at = Date.now()
 }))
 
-ProjectSchema.statics.update = async(function * (id, val, next) {
-  var project = yield this.findById(id) 
+ProjectSchema.statics.get = async(function * (id) {
+  if (!isMongoId(id)) throw new ValidationError('Invalid ID')
+  return yield this.findById(id)
+})
+
+ProjectSchema.statics.update = async(function * (id, val) {
+  var project = yield this.get(id)
   if (!project) throw new NotFoundError('Project not found', id)
   Object.assign(project, val)
   return yield project.save()

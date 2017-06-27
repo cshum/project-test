@@ -1,5 +1,13 @@
 module.exports = [
-  '$scope', '$timeout', '$routeParams',
-  function ($scope, $timeout, $routeParams) {
+  '$rootScope', '$scope', 'Auth',
+  function ($rootScope, $scope, Auth) {
+    $scope.error = null
+    $scope.form = {}
+    $scope.signup = function () {
+      return Auth.signup($scope.form)
+      .catch(function (err) {
+        $scope.error = err
+      })
+    }
   }
 ]

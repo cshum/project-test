@@ -1,37 +1,46 @@
-<div class="dashboard container">
-  <h2>Dashboard</h2>
-  <h4>New Projects</h4>
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-    </tbody>
-  </table>
-  <h4>Expired Projects</h4>
-  <table class="table table-hover">
-    <thead>
-      <tr>
-        <th>Firstname</th>
-        <th>Lastname</th>
-        <th>Email</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>John</td>
-        <td>Doe</td>
-        <td>john@example.com</td>
-      </tr>
-    </tbody>
-  </table>
+<div class="dashboard">
+  <div class="page-header">
+    <a class="btn btn-default btn-info pull-right" ui-sref="create">Create Project</a>
+    <h2>Dashboard</h2>
+  </div>
+  <div class="panel panel-default">
+    <div class="panel-heading">New Projects</div>
+    <div class="panel-body">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Start Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="project in list | filter: { status: '!expired'}" ng-click="$state.go('project', {project_id: project._id})">
+            <td>{{project.title}}</td>
+            <td>{{project.start_at | date:'yyyy-MM-dd'}}</td>
+            <td>{{project.status}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="panel-heading">Expired Projects</div>
+    <div class="panel-body">
+      <table class="table table-hover">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Start Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="project in list | filter: { status: 'expired'}" ng-click="$state.go('project', {project_id: project._id})">
+            <td>{{project.title}}</td>
+            <td>{{project.start_at | date:'yyyy-MM-dd'}}</td>
+            <td>{{project.status}}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>

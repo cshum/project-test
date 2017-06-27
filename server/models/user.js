@@ -4,8 +4,8 @@ const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 const crypto = require('crypto')
 const { async, hook } = require('../utils')
-const { AuthError, ServerError } = require('../errors')
-const { isEmail } = require('validator')
+const { AuthError, ServerError, ValidationError } = require('../errors')
+const { isEmail, isMongoId } = require('validator')
 const jwt = require('jsonwebtoken')
 const request = require('superagent')
 
@@ -77,7 +77,7 @@ UserSchema.statics.setSecret = (secret) => _secret = secret
 
 UserSchema.statics.verify = (token) => jwt.verify(token, _secret)
 
-// sign jwt token expires 1 hour
+// sign jwt token expires 4 hours
 UserSchema.statics.sign = ({ email, _id }) => {
   return {
     email, _id,
@@ -96,10 +96,11 @@ UserSchema.statics.login = async(function * ({ email, password }, next) {
 })
 
 UserSchema.methods.signup = async(function * () {
-  return this.sign(yield this.save())
+  return this.model('User').sign(yield this.save())
 })
 
 UserSchema.statics.get = async(function * (id) {
+  if (!isMongoId(id)) throw new ValidationError('Invalid ID')
   return clear(yield this.findById(id))
 })
 
