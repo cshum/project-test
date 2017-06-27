@@ -49,7 +49,7 @@ GET  /api/projects                list projects
 POST /api/projects                create project
 GET  /api/projects/:project_id    view project by id
 PUT  /api/projects/:project_id    update project by id
-GET  /api/me                  view self info
-PUT  /api/me                  update self info
-POST /api/token               extend auth token
+GET  /api/me                      view self info
+PUT  /api/me                      update self info
+POST /api/token                   extend auth token
 ```

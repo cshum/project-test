@@ -3,11 +3,10 @@ var app = angular.module('app', [
   'ui.router', 'ngCookies',
   'ngAnimate', 'mgcrea.ngStrap'
 ])
-var config = require('./config.json')
 var fs = require('fs') // for browserify load templates
 
 // Factories
-app.factory('httpInterceptor', require('./factories/httpinterceptor'))
+app.factory('HttpInterceptor', require('./factories/httpinterceptor'))
 app.factory('Auth', require('./factories/auth'))
 app.factory('Project', require('./factories/project'))
 
@@ -64,15 +63,14 @@ app.config([
     $urlRouterProvider.otherwise('/')
 
     $locationProvider.hashPrefix('')
-    $httpProvider.interceptors.push('httpInterceptor')
+    $httpProvider.interceptors.push('HttpInterceptor')
   }
 ])
 app.run([
   '$location', '$rootScope', '$state', 'Auth',
   function ($location, $rootScope, $state, Auth) {
-    $rootScope.config = config
     $rootScope.$state = $state
-    $rootScope.rootUrl = config.rootUrl || ''
+    $rootScope.rootUrl = '' // todo move to config
     angular.extend($rootScope, Auth)
 
     // redirect to login on unauthorized
