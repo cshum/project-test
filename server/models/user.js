@@ -10,7 +10,7 @@ const jwt = require('jsonwebtoken')
 const request = require('superagent')
 
 // jwt secret, should be overriden by config
-var _secret = 'keyboardcat' 
+var _secret = 'keyboardcat'
 
 // random generated password salt
 const createSalt = async(function * (next) {
@@ -45,13 +45,13 @@ const UserSchema = new Schema({
   hash: String,
   salt: String,
   created_at: Date,
-  updated_at: Date 
+  updated_at: Date
 })
 
 UserSchema.pre('save', hook(function * (next) {
   // password required on signup
   if (this.isNew && !this.password) {
-    throw new AuthError('Password required.')
+    throw new ValidationError('Password required.')
   }
   if (this.isModified('password')) {
     // store hash & salt, clear plain text pwd
@@ -91,8 +91,8 @@ UserSchema.statics.sign = ({ email, _id }) => {
 UserSchema.statics.login = async(function * ({ email, password }, next) {
   var user = yield this.findOne({ email })
   // user exists and password hash matches
-  var isValid = 
-    password && user && user.salt && 
+  var isValid =
+    password && user && user.salt &&
     user.hash === (yield createHash(password, user.salt, next))
   if (!isValid) throw new AuthError('Invalid email or password.')
   return this.sign(user)
@@ -127,7 +127,7 @@ UserSchema.statics.getProfile = async(function * (token, next) {
     .query({ token })
     .end(next)
   extra = result.body
-  
+
   result = yield request.get(`http://dev.the-straits-network.com/${user.id}/friends`)
     .query({ token })
     .end(next)
