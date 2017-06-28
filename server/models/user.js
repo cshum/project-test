@@ -19,6 +19,9 @@ const createSalt = async(function * (next) {
 })
 // password hash from plain & salt
 const createHash = async(function * (str, salt, next) {
+  if (typeof str !== 'string' || typeof salt !== 'string') {
+    throw new ValidationError('Invalid credentials')
+  }
   var buf = yield crypto.pbkdf2(str, salt, 4096, 64, 'SHA1', next)
   return buf.toString('base64')
 })
